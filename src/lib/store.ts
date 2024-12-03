@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 
-interface QuizQuestion {
+export interface IQuestion {
     id: number;
     question: string;
     options: string[];
@@ -9,12 +9,12 @@ interface QuizQuestion {
 
 export const useQuizStore = defineStore('quiz', {
     state: () => ({
-        questions: [] as Array<QuizQuestion>,
+        questions: [] as Array<IQuestion>,
         currentIndex: 0,
         answers: {} as Record<string, number>,
     }),
     actions: {
-        setQuestions(questions: Array<QuizQuestion>) {
+        setQuestions(questions: Array<IQuestion>) {
             this.questions = questions;
         },
         saveAnswer(questionId: string, choiceIndex: number) {
