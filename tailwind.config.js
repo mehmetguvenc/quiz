@@ -12,8 +12,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        'sans': ['Poppins', 'sans-serif'],
-        'serif': ['Merriweather', 'serif'],
+        'sans': ['Outfit', 'Poppins', 'sans-serif'],
+        'serif': ['IBM Plex Serif', 'serif'],
         'mono': ['Fira Code', 'monospace'],
       }
     },

@@ -1,6 +1,7 @@
 <script setup>
 import Header from '@/src/components/header.vue';
 import '@/src/assets/tailwind.css';
+
 </script>
 
 <template>
