@@ -1,4 +1,14 @@
 export default defineNuxtConfig({
+  // app: {
+  //   pageTransition: {
+  //     name: 'fade',
+  //     mode: 'out-in' // default
+  //   },
+  //   layoutTransition: {
+  //     name: 'slide',
+  //     mode: 'out-in' // default
+  //   }
+  // },
   devtools: {
     enabled: true,
     timeline: {

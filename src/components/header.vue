@@ -1,17 +1,19 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 
+const isMobile = ref(false);
 const atTop = ref(true)
 const open = ref(false) // Missing state for mobile menu
 
 onMounted(() => {
-    atTop.value = window.pageYOffset < 50
+    isMobile.value = window.innerWidth < 768;
+    atTop.value = window.scrollY < window.innerHeight / 5;
 })
 
 // Separate composable for scroll handling
 const useScrollHandler = () => {
     const handleScroll = () => {
-        atTop.value = window.pageYOffset < 50
+        atTop.value = window.scrollY < window.innerHeight / 5;
     }
 
     onMounted(() => {
@@ -21,56 +23,95 @@ const useScrollHandler = () => {
     onBeforeUnmount(() => {
         window.removeEventListener('scroll', handleScroll)
     })
-
     return { atTop }
 }
 
-const { atTop: scrollPosition } = useScrollHandler()
+const useResizeHandler = () => {
+    const handleResize = () => {
+        isMobile.value = window.innerWidth < 768;
+    }
 
-// Computed classes for better organization
-const navClasses = computed(() => ({
-    'bg-white/30 backdrop-blur-xl max-w-screen-xl': !scrollPosition.value,
-    'max-w-screen-2xl': scrollPosition.value
-}))
+    onMounted(() => {
+        handleResize()
+        window.addEventListener('resize', handleResize)
+    })
 
-const linkClasses = computed(() => ({
-    'text-white': scrollPosition.value,
-    'text-black': !scrollPosition.value
-}))
+    onBeforeUnmount(() => {
+        window.removeEventListener('resize', handleResize)
+    })
+    return { isMobile }
+}
+
+const { atTop: scrollPosition } = useScrollHandler();
+const { isMobile: mobile } = useResizeHandler();
+
 </script>
 
 <template>
-    <header
-        class="fixed z-50 w-full px-8 py-4 transition-all duration-500 rounded-full mt-4 inset-x-0 mx-auto ease-in-out transform"
-        :class="navClasses">
-        <div class="flex flex-col w-full p-2 mx-auto md:items-center md:justify-between md:flex-row">
+    <header class="wrapper header group" :class="!atTop || open ? 'md:mt-2 md:px-2 px-8' : 'md:mt-6 md:px-8'">
+        <div class="container" :class="(!atTop || open) && 'bg-white md:bg-white/30 backdrop-blur-2xl px-6'">
             <!-- Logo Section -->
-            <div class="flex flex-row items-center justify-between md:w-1/4">
-                <router-link :to="'/'" class="font-bold tracking-tighter uppercase" :class="linkClasses">
+            <div class="logo">
+                <router-link :to="'/'"
+                    class="font-serif font-bold tracking-tighter uppercase md:text-white text-slate-700"
+                    :class="isMobile && atTop && !open ? 'text-white' : 'text-slate-700'"
+                    >
                     ✺ Quizzical
                 </router-link>
-                <button class="md:hidden focus:outline-none" @click="open = !open">
-                    <!-- SVG Burger goes here -->
+                <button class="relative w-8 h-8 md:hidden focus:outline-none ml-auto" @click="open = !open">
+                    <div
+                        class="w-full absolute left-1/2 top-1/2 transform  -translate-x-1/2 -translate-y-1/2 text-slate-700"
+                        :class="isMobile && atTop && !open ? 'text-white' : 'text-slate-700'">
+                        <span aria-hidden="true"
+                            class="block absolute h-0.5 w-full bg-current transform transition duration-500 ease-in-out"
+                            :class="{ 'rotate-45': open, ' -translate-y-2': !open }"></span>
+                        <span aria-hidden="true"
+                            class="block absolute  h-0.5 w-full bg-current transform transition duration-500 ease-in-out"
+                            :class="{ 'opacity-0': open }"></span>
+                        <span aria-hidden="true"
+                            class="block absolute  h-0.5 w-full bg-current transform  transition duration-500 ease-in-out"
+                            :class="{ '-rotate-45': open, ' translate-y-2': !open }"></span>
+                    </div>
                 </button>
             </div>
 
-            <!-- Navigation Links - Centered -->
-            <nav class="flex-col flex-grow gap-8 hidden pb-4 md:pb-0 md:flex md:flex-row md:justify-center md:w-2/4">
+            <nav class="nav" :class="(isMobile) ? [open ? 'opacity-100 delay-300 mt-1.5' : 'opacity-0 mt-6'] : ''">
                 <router-link v-for="route in [{ path: '/', name: 'Home' }, { path: '/quiz', name: 'Quiz' }]"
-                    :key="route.path" :to="route.path" class="hover:text-gray-900 transition-colors" :class="[
-                        linkClasses,
-                        { 'text-gray-900 font-semibold': $route.path === route.path }
+                    :key="route.path" :to="route.path"
+                    class="md:hover:text-white transition-colors md:text-white/90 text-slate-700" :class="[{ 'underline font-bold': $route.path === route.path }
                     ]">{{ route.name }}
                 </router-link>
             </nav>
 
-            <!-- Sign In Button - Right -->
-            <div class="hidden md:flex md:w-1/4 md:justify-end">
-                <button class="px-8 py-2.5 rounded-full transition-colors text-sm"
-                    :class="atTop ? 'bg-white text-black' : 'bg-black/50 text-white backdrop-blur-sm'">
-                    Login
-                </button>
+            <div class="cta">
+                <a href="https://www.linkedin.com/in/mehmet-guvenc/" target="_blank"
+                    class="px-10 py-3 rounded-full bg-white transition-colors font-serif text-sm text-text">
+                    Contact
+                </a>
             </div>
         </div>
     </header>
 </template>
+
+
+<style scoped>
+.header {
+    @apply fixed z-30 w-full py-4 inset-x-0 mx-auto ease-in-out transform transition-all duration-500;
+
+    .container {
+        @apply flex flex-col w-full py-4 px-8 rounded-full mx-auto md:items-center md:justify-between md:flex-row transition-all duration-500 max-md:max-w-full;
+
+        .logo {
+            @apply flex flex-row items-center justify-between md:w-1/4;
+        }
+
+        .nav {
+            @apply flex-col flex-grow md:gap-8 gap-4 absolute md:relative max-md:left-0 max-md:top-full rounded-2xl w-full p-4 md:p-0 max-md:bg-white max-md:pb-4 md:pb-0 flex md:flex-row md:justify-center md:w-2/4 transition-all duration-500;
+        }
+
+        .cta {
+            @apply hidden md:flex md:w-1/4 md:justify-end;
+        }
+    }
+}
+</style>

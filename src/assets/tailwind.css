@@ -4,10 +4,145 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer {
+  :root {
+    --text-50: 238 239 246;
+    --text-100: 221 223 238;
+    --text-200: 188 190 220;
+    --text-300: 154 158 203;
+    --text-400: 120 126 186;
+    --text-500: 87 93 168;
+    --text-600: 69 75 135;
+    --text-700: 52 56 101;
+    --text-800: 35 37 67;
+    --text-900: 17 19 34;
+    --text-950: 9 9 17;
 
-button, input, select, textarea {
+    --background-50: 236 238 248;
+    --background-100: 218 220 241;
+    --background-200: 180 186 228;
+    --background-300: 143 151 214;
+    --background-400: 105 116 201;
+    --background-500: 68 82 187;
+    --background-600: 54 65 150;
+    --background-700: 41 49 112;
+    --background-800: 27 33 75;
+    --background-900: 14 16 37;
+    --background-950: 7 8 19;
+
+    --primary-50: 234 235 250;
+    --primary-100: 213 216 246;
+    --primary-200: 171 177 237;
+    --primary-300: 130 138 227;
+    --primary-400: 88 99 218;
+    --primary-500: 46 59 209;
+    --primary-600: 37 48 167;
+    --primary-700: 28 36 125;
+    --primary-800: 18 24 84;
+    --primary-900: 9 12 42;
+    --primary-950: 5 6 21;
+
+    --secondary-50: 232 234 253;
+    --secondary-100: 209 212 250;
+    --secondary-200: 163 170 245;
+    --secondary-300: 117 127 240;
+    --secondary-400: 70 84 236;
+    --secondary-500: 24 41 231;
+    --secondary-600: 19 33 185;
+    --secondary-700: 15 25 138;
+    --secondary-800: 10 17 92;
+    --secondary-900: 5 8 46;
+    --secondary-950: 2 4 23;
+
+    --accent-50: 230 232 255;
+    --accent-100: 205 209 254;
+    --accent-200: 154 162 254;
+    --accent-300: 104 116 253;
+    --accent-400: 53 70 253;
+    --accent-500: 3 23 252;
+    --accent-600: 2 19 202;
+    --accent-700: 2 14 151;
+    --accent-800: 1 9 101;
+    --accent-900: 1 5 50;
+    --accent-950: 0 2 25;
+
+  }
+
+  .dark {
+    --text-50: 9 9 17;
+    --text-100: 17 19 34;
+    --text-200: 35 37 67;
+    --text-300: 52 56 101;
+    --text-400: 69 75 135;
+    --text-500: 87 93 168;
+    --text-600: 120 126 186;
+    --text-700: 154 158 203;
+    --text-800: 188 190 220;
+    --text-900: 221 223 238;
+    --text-950: 238 239 246;
+
+    --background-50: 6 9 19;
+    --background-100: 13 18 38;
+    --background-200: 25 36 77;
+    --background-300: 38 54 115;
+    --background-400: 51 71 153;
+    --background-500: 64 89 191;
+    --background-600: 102 122 204;
+    --background-700: 140 156 217;
+    --background-800: 179 189 230;
+    --background-900: 217 222 242;
+    --background-950: 236 238 249;
+
+    --primary-50: 5 6 21;
+    --primary-100: 9 12 42;
+    --primary-200: 18 24 84;
+    --primary-300: 28 36 125;
+    --primary-400: 37 48 167;
+    --primary-500: 46 59 209;
+    --primary-600: 88 99 218;
+    --primary-700: 130 138 227;
+    --primary-800: 171 177 237;
+    --primary-900: 213 216 246;
+    --primary-950: 234 235 250;
+
+    --secondary-50: 2 4 23;
+    --secondary-100: 5 8 46;
+    --secondary-200: 10 17 92;
+    --secondary-300: 15 25 138;
+    --secondary-400: 19 33 185;
+    --secondary-500: 24 41 231;
+    --secondary-600: 70 84 236;
+    --secondary-700: 117 127 240;
+    --secondary-800: 163 170 245;
+    --secondary-900: 209 212 250;
+    --secondary-950: 232 234 253;
+
+    --accent-50: 0 2 25;
+    --accent-100: 1 5 50;
+    --accent-200: 1 9 101;
+    --accent-300: 2 14 151;
+    --accent-400: 2 19 202;
+    --accent-500: 3 23 252;
+    --accent-600: 53 70 253;
+    --accent-700: 104 116 253;
+    --accent-800: 154 162 254;
+    --accent-900: 205 209 254;
+    --accent-950: 230 232 255;
+  }
+}
+
+button,
+input,
+select,
+textarea {
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
+}
 
+
+@layer {
+  .wrapper {
+    @apply relative 3xl:max-w-screen-3xl xl:max-w-screen-xl lg:max-w-screen-lg md:max-w-screen-md max-w-screen-sm;
+  }
 }

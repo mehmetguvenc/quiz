@@ -2,144 +2,171 @@
 import { useQuizStore } from "@/src/lib/store";
 import { ref, onMounted } from "vue";
 import { useNuxtApp } from "#app";
-import Question from '@/src/components/question.vue'
-
-const { $gsap } = useNuxtApp();
+import Question from '@/src/components/question/index.vue';
+import Results from '@/src/components/result.vue';
 
 useHead({
-    title: 'Quiz App'
+    title: 'Questions | Quizzical',
+    meta: [
+        {
+            name: 'description',
+            content: 'A quiz app built with Vue 3 and Vite'
+        }
+    ]
 });
+
 const quizStore = useQuizStore();
 const { $axios } = useNuxtApp();
-const loading = ref(false);
+const loading = ref(true);
+const initialized = ref(false);
 
 const fetchQuestions = async () => {
     loading.value = true;
     try {
-        const { data, error } = await $axios.get("/questions"); // Relative to `baseURL`
-        quizStore.setQuestions(data);
-        if (!data) {
-            console.error("No questions found");
-            throw new Error("No questions found");
+        const { data } = await $axios.get("/questions");
+        if (data) {
+            quizStore.setQuestions(data);
         }
     } catch (error) {
         console.error("Error fetching questions:", error);
     } finally {
-        setTimeout(() => {
-            loading.value = false;
-        }, 100);
+        initialized.value = true;
     }
 };
 
-
-const nextQuestion = () => {
-    const _current = document.querySelector(`.question-${quizStore.currentIndex}`);
-    const nextIndex = Math.min(quizStore.currentIndex + 1, quizStore.questions.length - 1);
-    const _next = document.querySelector(`.question-${nextIndex}`);
-
-    $gsap.to(_current, {
-        opacity: 0,
-        duration: 1,
-        scale: 0.5,
-        ease: 'power2.out',
-    });
-
-    $gsap.fromTo(_next,
-        { opacity: 0, xPercent: 0 },
-        {
-            xPercent: -100,
-            opacity: 1,
-            duration: 1,
-            ease: 'power2',
-            delay: .3,
-            onComplete: () => {
-                quizStore.currentIndex = nextIndex;
-            }
+const fetchResult = async () => {
+    loading.value = true;
+    try {
+        const { data, error } = await $axios.post("/results", quizStore.answers);
+        if (data) {
+            quizStore.setResults(data);
+        } else {
+            console.error("Error saving response:", error);
         }
-    );
-
+    } catch (error) {
+        console.error("Error saving response:", error);
+    }
 };
 
-const prevQuestion = () => {
-    const _current = document.querySelector(`.question-${quizStore.currentIndex}`);
-    const prevIndex = Math.max(quizStore.currentIndex - 1, 0);
-    const _prev = document.querySelector(`.question-${prevIndex}`);
+watch(() => quizStore.completed, async (val) => {
+    if (val) {
+        await fetchResult().finally(() => {
+            loading.value = false;
+        });
+    }
+});
 
-    $gsap.to(_current,
-        {
-            xPercent: 100,
-            opacity: 0,
-            duration: 1,
-            ease: 'power2'
-        }
-    );
-
-    $gsap.fromTo(_prev,
-        { opacity: 0, scale: 0.5, },
-        {
-            opacity: 1,
-            duration: 1,
-            scale: 1,
-            ease: 'power2',
-            onComplete: () => {
-                quizStore.currentIndex = prevIndex;
-            }
-        }
-    );
-
-    // $gsap.to(_current, {
-    //     xPercent: 100,
-    //     opacity: 0,
-    //     duration: 0.5,
-    //     ease: 'power2.inOut',
-    //     onComplete: () => {
-    //         $gsap.fromTo(_prev,
-    //             { xPercent: -100, opacity: 0 },
-    //             { xPercent: 0, opacity: 1, duration: 0.5, ease: 'power2.inOut' }
-    //         );
-    //         quizStore.currentIndex = prevIndex;
-    //     }
-    // });
-};
 
 
 onBeforeMount(async () => {
-    await fetchQuestions();
+    await fetchQuestions().finally(() => {
+        loading.value = false;
+    });
 });
 
 </script>
 
-<style></style>
-
 <template>
-    <div class="wrapper">
-        <div v-if="loading">Loading...</div>
-        <div v-else class="relative">
-            <div class="flex relative w-full">
-                <Question v-for="(question, index) in quizStore.questions" :key="index" :options="question.options"
-                    :question="question.question" :next="() => nextQuestion()" :back="() => prevQuestion()"
-                    :class="[`question-${index}`, index !== quizStore.currentIndex && 'translate-x-full opacity-0']" />
+    <section class="w-wrapper">
+        <template v-if="loading">
+            <div class="loading-state">
+                <div class="spinner-wrapper">
+                    <p class="loading-text">
+                        Loading
+                        <span class="dots">
+                            <span class="dot">.</span>
+                            <span class="dot">.</span>
+                            <span class="dot">.</span>
+                        </span>
+                    </p>
+                </div>
             </div>
-        </div>
-    </div>
+        </template>
+        <template v-else>
+            <div v-if="quizStore.completed" class="inline-flex lg:max-w-screen-lg w-full grow mx-auto">
+                <Results :results="quizStore.results" />
+            </div>
+            <div v-else class="w-full relative">
+                <div class="relative lg:max-w-screen-lg w-full grow mx-auto">
+                    <Question v-for="(question, index) in quizStore.questions" :key="`question-${question.id}`"
+                        :index="index" :id="question.id" :options="question.options" :question="question.question"
+                        :class="[
+                            index === quizStore.currentIndex
+                                ? 'left-0'
+                                : 'left-full opacity-0 select-none pointer-events-none'
+                        ]" />
+                </div>
+            </div>
+        </template>
+    </section>
 </template>
 
 
 <style scoped>
-/* .relative {
-    @apply h-full;
-}
-
-.question-enter-active,
-.question-leave-active {
-    @apply absolute w-full;
-} */
-
-.wrapper {
-    @apply flex flex-col w-full h-full justify-center min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-teal-400 p-10;
+.w-wrapper {
+    @apply flex flex-col w-full h-full justify-center min-h-screen bg-gradient-to-br from-purple-600 via-blue-500 to-teal-400 p-10 overflow-hidden;
 
     &>div {
         @apply flex gap-5 w-full pt-20 grow;
+    }
+}
+
+
+.loading-state {
+    @apply flex items-center justify-center w-full h-full;
+
+    .spinner-wrapper {
+        @apply flex flex-col items-center gap-4;
+
+        .loading-text {
+            @apply text-white text-4xl font-medium;
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .dots {
+            @apply inline-flex;
+        }
+
+        .dot {
+            @apply opacity-0;
+            animation: dotFade 1.4s linear infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+
+    }
+}
+
+@keyframes dotFade {
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: translateY(0);
+    }
+
+    50% {
+        opacity: 1;
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
     }
 }
 
