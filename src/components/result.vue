@@ -36,6 +36,13 @@ onMounted(() => {
         duration: 1
     });
 
+    // Animate score
+    tl.from('.my-score', {
+        x: -50,
+        opacity: 0,
+        duration: 0.5
+    });
+
     // Animate answer items
     tl.from('.answer-item', {
         x: -50,
@@ -64,7 +71,7 @@ const retakeQuiz = () => {
             </svg>
 
             <div class="mt-8 space-y-4">
-                <p class="text-2xl text-center text-white">
+                <p class="text-2xl text-center text-white my-score">
                     Score: {{ results.score }} / {{ results.totalQuestions }}
                 </p>
                 <div class="answers-breakdown">
