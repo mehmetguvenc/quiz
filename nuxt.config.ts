@@ -29,7 +29,8 @@ export default defineNuxtConfig({
   css: ['@/src/assets/tailwind.css'],
   runtimeConfig: {
     public: {
-      apiBaseUrl: 'http://localhost:3000/api', // Replace with your base URL
+      //if development localhost:3000 if not get baseurl from site
+      apiBaseUrl: process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://fasttrack-quiz-app.netlify.app/',
     },
   },
   compatibilityDate: '2024-12-03',
